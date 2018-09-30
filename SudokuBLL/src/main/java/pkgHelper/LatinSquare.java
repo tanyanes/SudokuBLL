@@ -2,6 +2,8 @@ package pkgHelper;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class LatinSquare {
 
 	/**
@@ -18,9 +20,27 @@ public class LatinSquare {
 	 * @version 1.1
 	 * @since Lab #1
 	 */
-	public LatinSquare() {
-
+	
+	private boolean bIgnoreZero;
+	
+	public boolean isbIgnoreZero() {
+		return bIgnoreZero;
 	}
+
+
+
+	public void setbIgnoreZero(boolean bIgnoreZero) {
+		this.bIgnoreZero = bIgnoreZero;
+	}
+
+
+
+	public LatinSquare() {
+		super();
+		this.bIgnoreZero=false;
+	}
+	
+	
 
 	/**
 	 * Pass in a given puzzle, set the LatinSquare
@@ -54,7 +74,7 @@ public class LatinSquare {
 	 * @param latinSquare
 	 *            - pass in an instance of a possible LatinSquare
 	 */
-
+	
 	public void setLatinSquare(int[][] latinSquare) {
 		LatinSquare = latinSquare;
 	}
@@ -68,14 +88,33 @@ public class LatinSquare {
 	 *            - one dimensional array to check for duplicates
 	 * @return - returns 'true' if any of the elements are duplicate
 	 */
+	
+	protected boolean hasDuplicates() {
+		for(int i=0;i<LatinSquare.length;i++) {
+			if(hasDuplicates(getRow(i))) {
+				return true;
+			}
+		}
+		for (int j=0; j<LatinSquare.length;j++) {
+			if (hasDuplicates(getColumn(j))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean hasDuplicates(int[] arr) {
 
 		// TODO: Return 'true' if any element in arr is duplicate
 
 		boolean hasDuplicates = false;
 		int[] sortedArray = Arrays.copyOf(arr, arr.length);
+		
+		if (bIgnoreZero)
+			sortedArray = RemoveZeroes(sortedArray);
+		
 		Arrays.sort(sortedArray);
-
+		
 		for (int i = 0; i < sortedArray.length - 1; i++) {
 			if (sortedArray[i] == sortedArray[i + 1]) {
 				hasDuplicates = true;
@@ -110,7 +149,14 @@ public class LatinSquare {
 		return doesElementExist;
 
 	}
-
+	
+	private int[] RemoveZeroes(int[] arr) {
+		while (ArrayUtils.contains(arr,0)) {
+			arr= ArrayUtils.removeElement(arr,0);
+		}
+		return arr;
+	}
+	
 	/**
 	 * hasAllValues - return 'true' if every element from arr2 is in arr1
 	 * 

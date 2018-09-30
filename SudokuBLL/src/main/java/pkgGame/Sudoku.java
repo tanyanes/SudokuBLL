@@ -1,6 +1,9 @@
 package pkgGame;
 
-
+import java.lang.reflect.Array;
+import java.util.Random;
+import org.apache.commons.lang3.ArrayUtils;
+import javassist.bytecode.stackmap.TypeData.ArrayElement;
 import pkgHelper.LatinSquare;
 
 public class Sudoku extends LatinSquare {
@@ -43,6 +46,18 @@ public class Sudoku extends LatinSquare {
 		return getLatinSquare();
 	}
 	
+	@Override
+	public boolean hasDuplicates() {
+		if(super.hasDuplicates()) {
+			return true;
+		}
+		for (int k = 0; k< this.getPuzzle().length; k++) {
+			if(super.hasDuplicates(getRegion(k))) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public int[] getRegion(int r) {
 		int[] reg = new int[getLatinSquare().length];
 		
@@ -66,35 +81,15 @@ public class Sudoku extends LatinSquare {
 	}
 	
 	public boolean isPartialSudoku() {
-		int[] firstRow = getRow(0);
-		int[] temp;
+		this.setbIgnoreZero(true);
 		
-		if(!this.isLatinSquare()) {
-			if(ContainsZero()) {
-				return true;
-			}
+		if (hasDuplicates()){
 			return false;
 		}
-		
-		for(int j = 0; j < iSize; j++) {
-			temp = getRegion(j);
-			
-			if(hasDuplicates(temp)) {
-				return false;
-			}
-			if (!ContainsZero()) {
-				return false;
-			}
-			if(!(hasAllValues(temp, firstRow))) {
-				if(ContainsZero()) {
-					return true;
-				}
-				return false;
-			}
+		if (!ContainsZero()) {
+			return false;
 		}
-		
 		return true;
-		
 	}
 	
 	public boolean isSudoku() {
@@ -112,4 +107,54 @@ public class Sudoku extends LatinSquare {
 		}
 		return test;
 	}
+	public void PrintPuzzle() {
+		System.out.println(getPuzzle());
+	}
+	
+	private void FillDiagonalRegions() {
+		if (iSqrtSize == 3) {
+			int[] diagonalIndeces= {0,4,8};
+			for (int i=0; i< 3; i++) {
+				SetRegion(diagonalIndeces[i]);
+			}
+		}
+		if (iSqrtSize == 2) {
+			int[] diagonalIndeces= {0,3};
+			for (int i = 0; i< 2; i++) {
+				SetRegion(diagonalIndeces[i]);
+			}
+		}
+	}
+	
+	private void SetRegion(int r) {
+		Random rand = new Random();
+		int max=getRegion(0,0).length;
+		int value = rand.nextInt(max);
+		for (int i = 0; i < iSize; i++) {
+			if () { //dont really know what to write here!!!!!
+				getRegion(r)[i] = value;
+			}
+		}	
+	}
+	
+	private void ShuffleRegion(int r) {
+		int[] myReg = getRegion(r);
+		ShuffleArray(myReg);
+	}
+	
+	private void ShuffleArray(int[] arr) {
+		Random rand = new Random();
+		int max=getRegion(0,0).length;
+		int value = rand.nextInt(max);
+		int[] emptyList = new int[max];
+		for (int i=0; i< max; i++) {
+			emptyList[i]=i;
+		}
+		
+		for (int k = 0; k< arr.length; k++) {
+			arr[k]= arr[value];
+			emptyList = ArrayUtils.removeElement(emptyList, emptyList[value]);
+		}
+	}
+	
 }
