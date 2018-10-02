@@ -222,4 +222,57 @@ public class SudokuTest {
 			assertFalse(temp.isValidValue(0, 0, 6));
 			
 		}
+		
+		@Test
+		public void testGetRegionNbr() throws Exception{
+			int[][] test = {
+					{0,9,1,8,5,6,3,2,4},
+					{6,8,5,2,4,3,7,1,9},
+					{3,2,4,1,7,9,5,8,6},
+					{9,7,2,3,1,5,4,6,8},
+					{8,5,3,4,6,2,9,7,1},
+					{1,4,6,9,8,7,2,3,5},
+					{5,6,9,7,3,8,1,4,2},
+					{4,3,8,5,2,1,6,9,7},
+					{2,1,7,6,9,4,8,5,3}
+		};
+		Sudoku temp = new Sudoku(test);
+		assertTrue(temp.getRegionNbr(1, 1)==0);
 }
+		@Test
+		public void testGetRegionNbr2() throws Exception{
+			int[][] test = {
+					{0,9,1,8,5,6,3,2,4},
+					{6,8,5,2,4,3,7,1,9},
+					{3,2,4,1,7,9,5,8,6},
+					{9,7,2,3,1,5,4,6,8},
+					{8,5,3,4,6,2,9,7,1},
+					{1,4,6,9,8,7,2,3,5},
+					{5,6,9,7,3,8,1,4,2},
+					{4,3,8,5,2,1,6,9,7},
+					{2,1,7,6,9,4,8,5,3}
+		};
+		Sudoku temp = new Sudoku(test);
+		assertTrue(temp.getRegionNbr(7, 7)==8);
+}
+		@Test
+		public void testGetRegionNbr3() throws Exception{
+			int[][] test = {
+					{0,9,1,8,5,6,3,2,4},
+					{6,8,5,2,4,3,7,1,9},
+					{3,2,4,1,7,9,5,8,6},
+					{9,7,2,3,1,5,4,6,8},
+					{8,5,3,4,6,2,9,7,1},
+					{1,4,6,9,8,7,2,3,5},
+					{5,6,9,7,3,8,1,4,2},
+					{4,3,8,5,2,1,6,9,7},
+					{2,1,7,6,9,4,8,5,3}
+		};
+		Sudoku temp = new Sudoku(test);
+		assertFalse(temp.getRegionNbr(1, 1)==5);
+		}
+		//cannot test private methods
+		//didn't learn array reflect
+		//shuffle changes a copied array, does not modify the array from LatinSquare
+		//Java does pass by value for primitives, cannot fix this without help from professor
+		}

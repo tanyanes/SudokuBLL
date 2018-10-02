@@ -1,9 +1,7 @@
 package pkgGame;
 
-import java.lang.reflect.Array;
 import java.util.Random;
-import org.apache.commons.lang3.ArrayUtils;
-import javassist.bytecode.stackmap.TypeData.ArrayElement;
+import java.lang.reflect.Array;
 import pkgHelper.LatinSquare;
 
 public class Sudoku extends LatinSquare {
@@ -107,6 +105,11 @@ public class Sudoku extends LatinSquare {
 		}
 		return test;
 	}
+	
+	public int getRegionNbr(int iCol, int iRow) {
+		return (iCol/iSqrtSize)*iSqrtSize +(iRow/iSqrtSize);
+	}
+	
 	public void PrintPuzzle() {
 		System.out.println(getPuzzle());
 	}
@@ -116,23 +119,24 @@ public class Sudoku extends LatinSquare {
 			int[] diagonalIndeces= {0,4,8};
 			for (int i=0; i< 3; i++) {
 				SetRegion(diagonalIndeces[i]);
+				ShuffleRegion(diagonalIndeces[i]);
 			}
 		}
 		if (iSqrtSize == 2) {
 			int[] diagonalIndeces= {0,3};
 			for (int i = 0; i< 2; i++) {
 				SetRegion(diagonalIndeces[i]);
+				ShuffleRegion(diagonalIndeces[i]);
 			}
 		}
 	}
 	
-	private void SetRegion(int r) {
-		Random rand = new Random();
-		int max=getRegion(0,0).length;
-		int value = rand.nextInt(max);
-		for (int i = 0; i < iSize; i++) {
-			if () { //dont really know what to write here!!!!!
-				getRegion(r)[i] = value;
+	private void SetRegion(int r) { //use a counter
+		int n = 1;
+		for (int i = ((r % iSqrtSize) * iSqrtSize); i < i + iSqrtSize; i++) {
+			for (int j= (r / iSqrtSize) * iSqrtSize; j < j+ iSqrtSize; j++) {
+				this.getPuzzle()[i][j] = n;
+				n++;
 			}
 		}	
 	}
@@ -142,18 +146,25 @@ public class Sudoku extends LatinSquare {
 		ShuffleArray(myReg);
 	}
 	
+	//public void testShuffleRegion(int r) {
+		//ShuffleRegion(r);
+	//}
+	
+	//public void testShuffleArray(int[] r) {
+		//ShuffleArray(r);
+	//}
+	
 	private void ShuffleArray(int[] arr) {
 		Random rand = new Random();
-		int max=getRegion(0,0).length;
-		int value = rand.nextInt(max);
-		int[] emptyList = new int[max];
-		for (int i=0; i< max; i++) {
-			emptyList[i]=i;
-		}
+		int count = arr.length;
+		int temp;
+		int rand_int;
 		
-		for (int k = 0; k< arr.length; k++) {
-			arr[k]= arr[value];
-			emptyList = ArrayUtils.removeElement(emptyList, emptyList[value]);
+		for(int j = count; j > 1; j--) {
+			temp = arr[j-1];
+			rand_int = rand.nextInt(j);
+			arr[j-1] = arr[rand_int];
+			arr[rand_int] = temp;
 		}
 	}
 	
