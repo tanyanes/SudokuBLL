@@ -98,6 +98,69 @@ public class Sudoku extends LatinSquare {
 	 * @return - returns the LatinSquare instance
 	 */
 	
+	//new methods start here
+	
+	//added a hashmap to Sudoku class as a private attribute, how can i use cell here?
+	private HashMap<Integer,Cell> Cells = new HashMap<Integer,Cell>();
+	
+	//Gibbons added a private attribute called HashSet of integers to get  the range of unused values
+	//note*** this was not in the lab write-up
+	//this is called a block, it is not a method or function, which is why it made me use "{" so much more
+	private HashSet<Integer> hsCellRange = new HashSet<Integer>() {
+		{
+		for(int i = 0;i<iSize;i++) {
+			hsCellRange.add(i+1);
+		}
+		HashSet<Integer> hsUsedValues = new HashSet<Integer>();
+		Collections.addAll(hsUsedValues, Arrays.stream(super.getRow(iRow).boxed().toArray(Integer[]::new)));
+		Collections.addAll(hsUsedValues, Arrays.stream(super.getColumn(iCol).boxed().toArray(Integer[]::new)));
+		Collections.addAll(hsUsedValues, Arrays.stream(super.getRegion(iRegion).boxed().toArray(Integer[]::new)));
+		
+		hsCellRange.removeAll(hsUsedValues);
+		return hsCellRange;
+		}
+	private void SetCells() {
+		for (int iRow=0; iRow<iSize;iRow++) {
+			for(int iCol=0;iCol<iSize;iCol++) {
+				Cell c = new Cell(iRow,iCol);
+				c.setlstValidValues(getAllValidCellValues(iCol,iRow));
+				c.ShuffleValidValues();
+				Cells.put(c.hashCode(), c);
+				//Cell cl= Cells.get(Objects.hash(2,2)); idk what this is but the professor added that
+				}
+		}
+	}
+	
+	//this method confused me honestly
+	private void ShowAvailableValues() { 
+		for(int iRow = 0; iRow<iSize;iRow++) {
+			for(int iCol=0;iCol<iSize;iCol++) {
+				Cell c = Cell.GetNextCell(Objects.hash(iRow,iCol)); //something got here
+			for(Integer i; c.getlstValidValues()) {
+				System.out.println(i+" ")
+				}
+			}
+		}
+	}
+	
+	//somehow related to hscellrange
+	private HashSet<Integer> getAllValidCellValues(int x,int y) {
+		
+	}
+	
+	private boolean fillRemaining(Cell c) {
+		if(c==null) {
+			return true;
+		}
+		for(int num:c.getlstValidValues()) {
+			if(isValidValue(c,num)) {
+				this.getPuzzle()[c.getiRow][c.getiCol] = num;
+			}
+		}
+		return false;
+	}
+	
+	
 	//cell class
 	private class Cell {
 		private HashMap<Cell, Integer> hashMap = new HashMap<Cell, Integer>(); 
@@ -124,6 +187,7 @@ public class Sudoku extends LatinSquare {
 			return Objects.hash(iRow, iCol);
 		}
 		
+		@Override
 		public boolean equals(Object o) {
 			if(o == this) {
 				return true;
@@ -139,7 +203,7 @@ public class Sudoku extends LatinSquare {
 			return lstValidValues;
 		}
 		
-		public int[] setlstValidValues() {
+		public void setlstValidValues(HashSet<Integer> hsValidValues) {
 			lstValidValues = new ArrayList<Integer>(hsValidValues);
 		}
 		
