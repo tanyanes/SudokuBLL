@@ -101,24 +101,39 @@ public class Sudoku extends LatinSquare {
 	//new methods start here
 	
 	//added a hashmap to Sudoku class as a private attribute, how can i use cell here?
-	private HashMap<Integer,Cell> Cells = new HashMap<Integer,Cell>();
+	
+	private HashMap<Integer,Cell> cells = new HashMap<Integer,Cell>();
+	
+	//needed a getter method for the hashcode for a specific cell at index row,column
+	public static Integer getCellHashCode(Integer row, Integer column) {
+		return Objects.hash(row,column);
+	}
 	
 	//Gibbons added a private attribute called HashSet of integers to get  the range of unused values
 	//note*** this was not in the lab write-up
 	//this is called a block, it is not a method or function, which is why it made me use "{" so much more
-	private HashSet<Integer> hsCellRange = new HashSet<Integer>() {
-		{
+	
+	private HashSet<Integer> getAllValidCellValues(int iCol, int iRow)
+	{
+		
+	//private HashSet<Integer> hsCellRange = new HashSet<Integer>();
+		
+		HashSet<Integer> hsCellRange = new HashSet<Integer>();
+		
 		for(int i = 0;i<iSize;i++) {
 			hsCellRange.add(i+1);
 		}
 		HashSet<Integer> hsUsedValues = new HashSet<Integer>();
 		Collections.addAll(hsUsedValues, Arrays.stream(super.getRow(iRow).boxed().toArray(Integer[]::new)));
+			
+		
 		Collections.addAll(hsUsedValues, Arrays.stream(super.getColumn(iCol).boxed().toArray(Integer[]::new)));
 		Collections.addAll(hsUsedValues, Arrays.stream(super.getRegion(iRegion).boxed().toArray(Integer[]::new)));
 		
 		hsCellRange.removeAll(hsUsedValues);
 		return hsCellRange;
 		}
+	
 	private void SetCells() {
 		for (int iRow=0; iRow<iSize;iRow++) {
 			for(int iCol=0;iCol<iSize;iCol++) {
@@ -142,11 +157,11 @@ public class Sudoku extends LatinSquare {
 			}
 		}
 	}
-	
-	//somehow related to hscellrange
-	private HashSet<Integer> getAllValidCellValues(int x,int y) {
-		
-	}
+//	
+//	//somehow related to hscellrange
+//	private HashSet<Integer> getAllValidCellValues(int x,int y) {
+//		
+//	}
 	
 	private boolean fillRemaining(Cell c) {
 		if(c==null) {
@@ -163,8 +178,6 @@ public class Sudoku extends LatinSquare {
 	
 	//cell class
 	private class Cell {
-		private HashMap<Cell, Integer> hashMap = new HashMap<Cell, Integer>(); 
-		
 		private int iRow, iCol;
 		private ArrayList<Integer> lstValidValues = new ArrayList<Integer>();
 		
@@ -216,14 +229,20 @@ public class Sudoku extends LatinSquare {
 			int iRow = c.getiRow();
 			int iSqrtSize=(int)Math.sqrt(iSize);
 			
-			if(iCol >= iSize && iRow < iSize- 1) {
+			if(iCol >= iSize && iRow < iSize- 1) { //transforming 0,3 to 1,0
 				iRow = iRow + 1;
 				iCol = 0;
 			}
-			if (iRow >= iSize && iCol >= iSize) {
+			if (iRow >= iSize && iCol >= iSize) { //if out of bounds, greater than length of latin square
 				return null;
 			}
-			if (iRow < iSqrtSize) {
+			if (iRow > 0 && iCol > 0) { //if out of bounds, less than 0
+				return null;
+			}
+			
+			//redundant form to advance the cell so it doesn't return what was pre-filled from fill diagonal regions
+			
+			/*if (iRow < iSqrtSize) {
 				if (iCol < iSqrtSize) {
 					iCol= iSqrtSize;
 				}else if (iRow < iSize - iSqrtSize) {
@@ -239,7 +258,7 @@ public class Sudoku extends LatinSquare {
 						}
 					}
 				}
-			}
+			}*/
 		}
 	}
 	
