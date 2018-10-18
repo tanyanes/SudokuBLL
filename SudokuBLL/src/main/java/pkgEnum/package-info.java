@@ -1,0 +1,8 @@
+/**
+ * 
+ */
+/**
+ * @author TNest
+ *
+ */
+package pkgEnum;
