@@ -8,14 +8,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
 import pkgEnum.ePuzzleViolation;
 import pkgHelper.LatinSquare;
 import pkgHelper.PuzzleViolation;
-
 /**
  * Sudoku - This class extends LatinSquare, adding methods, constructor to
  * handle Sudoku logic
@@ -26,7 +24,6 @@ import pkgHelper.PuzzleViolation;
  *
  */
 public class Sudoku extends LatinSquare {
-
 	/**
 	 * 
 	 * iSize - the length of the width/height of the Sudoku puzzle.
@@ -46,7 +43,7 @@ public class Sudoku extends LatinSquare {
 
 	private int iSqrtSize;
 
-	/**
+	/** puzzle 
 	 * Sudoku - for Lab #2... do the following:
 	 * 
 	 * set iSize If SquareRoot(iSize) is an integer, set iSqrtSize, otherwise throw
@@ -66,6 +63,12 @@ public class Sudoku extends LatinSquare {
 		} else {
 			throw new Exception("Invalid size");
 		}
+		int[][] puzzle = new int[iSize][iSize];
+		super.setLatinSquare(puzzle);
+		
+		FillDiagonalRegions();
+		SetCells();
+		fillRemaining(this.cells.get(Objects.hash(0,iSqrtSize)));
 	}
 
 	/**
@@ -100,9 +103,9 @@ public class Sudoku extends LatinSquare {
 	
 	//new methods start here
 	
-	//added a hashmap to Sudoku class as a private attribute, how can i use cell here?
+	//added a hashmap to Sudoku class as a private attribute
 	
-	private HashMap<Integer,Cell> cells = new HashMap<Integer,Cell>();
+	private HashMap<Integer, Cell> cells = new HashMap<Integer, Cell>();
 	
 	//needed a getter method for the hashcode for a specific cell at index row,column
 	public static Integer getCellHashCode(Integer row, Integer column) {
@@ -111,25 +114,21 @@ public class Sudoku extends LatinSquare {
 	
 	//Gibbons added a private attribute called HashSet of integers to get  the range of unused values
 	//note*** this was not in the lab write-up
-	//this is called a block, it is not a method or function, which is why it made me use "{" so much more
 	
-	private HashSet<Integer> getAllValidCellValues(int iCol, int iRow)
-	{
-		
-	//private HashSet<Integer> hsCellRange = new HashSet<Integer>();
-		
+	private HashSet<Integer> getAllValidCellValues(int iCol, int iRow) {
+
 		HashSet<Integer> hsCellRange = new HashSet<Integer>();
-		
-		for(int i = 0;i<iSize;i++) {
-			hsCellRange.add(i+1);
+		for (int i = 0; i < iSize; i++) {
+		hsCellRange.add(i + 1);
 		}
 		HashSet<Integer> hsUsedValues = new HashSet<Integer>();
-		Collections.addAll(hsUsedValues, Arrays.stream(super.getRow(iRow).boxed().toArray(Integer[]::new)));
-			
-		
-		Collections.addAll(hsUsedValues, Arrays.stream(super.getColumn(iCol).boxed().toArray(Integer[]::new)));
-		Collections.addAll(hsUsedValues, Arrays.stream(super.getRegion(iRegion).boxed().toArray(Integer[]::new)));
-		
+
+		Collections.addAll(hsUsedValues, Arrays.stream(super.
+		getRow(iRow)).boxed().toArray(Integer[]::new));
+
+		Collections.addAll(hsUsedValues, Arrays.stream(super.getColumn(iCol)).boxed().toArray(Integer[]::new));
+		Collections.addAll(hsUsedValues, Arrays.stream(this.getRegion(iCol, iRow)).boxed().toArray(Integer[]::new));
+
 		hsCellRange.removeAll(hsUsedValues);
 		return hsCellRange;
 		}
@@ -140,41 +139,44 @@ public class Sudoku extends LatinSquare {
 				Cell c = new Cell(iRow,iCol);
 				c.setlstValidValues(getAllValidCellValues(iCol,iRow));
 				c.ShuffleValidValues();
-				Cells.put(c.hashCode(), c);
+				cells.put(c.hashCode(), c);
 				//Cell cl= Cells.get(Objects.hash(2,2)); idk what this is but the professor added that
 				}
 		}
 	}
 	
-	//this method confused me honestly
-	private void ShowAvailableValues() { 
-		for(int iRow = 0; iRow<iSize;iRow++) {
-			for(int iCol=0;iCol<iSize;iCol++) {
-				Cell c = Cell.GetNextCell(Objects.hash(iRow,iCol)); //something got here
-			for(Integer i; c.getlstValidValues()) {
-				System.out.println(i+" ")
+	private void ShowAvailableValues() {
+		for (int iRow = 0; iRow < iSize; iRow++) {
+			for (int iCol = 0; iCol < iSize; iCol++) {
+
+				Cell c = cells.get(Objects.hash(iRow, iCol));
+				for (Integer i : c.getlstValidValues()) {
+					System.out.print(i + " ");
 				}
+				System.out.println("");
 			}
 		}
 	}
-//	
-//	//somehow related to hscellrange
-//	private HashSet<Integer> getAllValidCellValues(int x,int y) {
-//		
-//	}
 	
 	private boolean fillRemaining(Cell c) {
-		if(c==null) {
+
+		if (c == null)
 			return true;
-		}
-		for(int num:c.getlstValidValues()) {
-			if(isValidValue(c,num)) {
-				this.getPuzzle()[c.getiRow][c.getiCol] = num;
+
+		for (int num : c.getlstValidValues()) {
+			if (isValidValue(c.getiRow(), c.getiCol(), num)) { //fixed this
+				this.getPuzzle()[c.getiRow()][c.getiCol()] = num;
+
+				if (fillRemaining(c.GetNextCell(c))) //recursive statement
+					return true;
+				this.PrintPuzzle();
+
+				this.getPuzzle()[c.getiRow()][c.getiCol()] = 0;
 			}
 		}
 		return false;
+
 	}
-	
 	
 	//cell class
 	private class Cell {
@@ -225,44 +227,37 @@ public class Sudoku extends LatinSquare {
 		}
 		
 		public Cell GetNextCell(Cell c) {
-			int iCol = c.getiCol() +1;
+
+			int iCol = c.getiCol() + 1;
 			int iRow = c.getiRow();
-			int iSqrtSize=(int)Math.sqrt(iSize);
-			
-			if(iCol >= iSize && iRow < iSize- 1) { //transforming 0,3 to 1,0
+			int iSqrtSize = (int) Math.sqrt(iSize);
+
+			if (iCol >= iSize && iRow < iSize - 1) {
 				iRow = iRow + 1;
 				iCol = 0;
 			}
-			if (iRow >= iSize && iCol >= iSize) { //if out of bounds, greater than length of latin square
+			if (iRow >= iSize && iCol >= iSize)
 				return null;
-			}
-			if (iRow > 0 && iCol > 0) { //if out of bounds, less than 0
-				return null;
-			}
-			
-			//redundant form to advance the cell so it doesn't return what was pre-filled from fill diagonal regions
-			
-			/*if (iRow < iSqrtSize) {
-				if (iCol < iSqrtSize) {
-					iCol= iSqrtSize;
-				}else if (iRow < iSize - iSqrtSize) {
-					if(iCol == (int)(iRow/iSqrtSize*iSqrtSize)) {
-						iCol=iCol+iSqrtSize;
-					}
-				}else {
-					if(iCol == iSize - iSqrtSize) {
-						iRow = iRow + 1;
-						iCol = 0;
-						if(iRow >=iSize) {
-							return null;
-						}
-					}
+
+			if (iRow < iSqrtSize) {
+				if (iCol < iSqrtSize)
+					iCol = iSqrtSize;
+			} else if (iRow < iSize - iSqrtSize) {
+				if (iCol == (int) (iRow / iSqrtSize) * iSqrtSize)
+					iCol = iCol + iSqrtSize;
+			} else {
+				if (iCol == iSize - iSqrtSize) {
+					iRow = iRow + 1;
+					iCol = 0;
+					if (iRow >= iSize)
+						return null;
 				}
-			}*/
+			}
+
+			return (Cell) cells.get(Objects.hash(iRow, iCol));
+
 		}
 	}
-	
-	
 	
 	public int[][] getPuzzle() {
 		return super.getLatinSquare();
@@ -567,15 +562,15 @@ public class Sudoku extends LatinSquare {
 	// line break after each row//
 
 	public void PrintPuzzle() {
-		
-		int[][] puzzle = getPuzzle();
-		
 		for (int i = 0; i < this.getPuzzle().length; i++) {
 			System.out.println("");
 			for (int j = 0; j < this.getPuzzle().length; j++) {
-				System.out.println(this.getPuzzle()[i][j]);
-				// finish editing this code
+				System.out.print(this.getPuzzle()[i][j]);
+				if ((j + 1) % iSqrtSize == 0)
+					System.out.print(" ");
 			}
+			if ((i + 1) % iSqrtSize == 0)
+				System.out.println(" ");
 		}
 	}
 	
